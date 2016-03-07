@@ -10,6 +10,7 @@ string to_string(T value) {
     return os.str();
 }
 
+// 节点数据结构，能够连接前和后两方向的Node
 struct Node {
     int start;
     int size;
@@ -17,7 +18,7 @@ struct Node {
     Node(int _start=0, int _size=0) : start(_start), size(_size), pre(NULL), next(NULL) {}
 };
 
-
+// 建构三个Node的顺序关系，使得有node1 -> node2 -> node3
 void adjust(Node* node1, Node* node2, Node* node3) {
     node2->pre = node1;
     node2->next = node3;
@@ -25,44 +26,44 @@ void adjust(Node* node1, Node* node2, Node* node3) {
     node3->pre = node2;
 }
 
-
+// 输出Node信息
 void display(string name, Node* node) {
     cout << name << ": ";
     cout << '(' << node->start << ", ";
     cout << node->size << ')' << endl;
 }
 
-
+// 列表结构
 struct List {
-    Node *super_header, *super_trailor;
+    Node *super_header, *super_trailer;
     List(int size) {
         super_header = new Node();
-        super_trailor = new Node();
-        super_header->next = super_trailor;
-        super_trailor->pre = super_header;
+        super_trailer = new Node();
+        super_header->next = super_trailer;
+        super_trailer->pre = super_header;
         Node* node = new Node(0, size);
-        adjust(super_header, node, super_trailor);
+        adjust(super_header, node, super_trailer);
     }
     void insert(Node* node) {
         if (!node) return;
         if (empty()) {      // empty
-            adjust(super_header, node, super_trailor);
+            adjust(super_header, node, super_trailer);
         }
         else {
-            Node* last_node = super_trailor->pre;
+            Node* last_node = super_trailer->pre;
             if (node->start > last_node->start) {       // 应该插到最后一个位置
                 if (last_node->start + last_node->size == node->start) {
                     last_node->size += node->size;
                     delete(node);
                 }
                 else {
-                    adjust(last_node, node, super_trailor);
+                    adjust(last_node, node, super_trailer);
                 }
             }
             else {
                 Node* cur_node = super_header->next;
                 bool merge_flag = false;
-                while (cur_node != super_trailor) {
+                while (cur_node != super_trailer) {
                     if (cur_node->start > node->start) {
                         Node* pre_node = cur_node->pre;
                         if (pre_node != super_header && pre_node->start + pre_node->size == node->start) {      // 可以和前面合并
@@ -90,7 +91,7 @@ struct List {
         }
     }
     bool empty() {
-        return super_header->next == super_trailor;
+        return super_header->next == super_trailer;
     }
     Node* first() {
         if (!empty())
@@ -100,7 +101,7 @@ struct List {
     }
 };
 
-
+// 输出一个列表的信息，依序输出其中的节点Node信息
 void display_list(List* node_list) {
     cout << "free list: " << endl;
     if (node_list->empty()) {
@@ -110,7 +111,7 @@ void display_list(List* node_list) {
     int no = 0;
     string name_pre = "node";
     Node* node = node_list->first();
-    while (node != node_list->super_trailor) {
+    while (node != node_list->super_trailer) {
         string name = "  ";
         name += name_pre;
         name += to_string(no ++);
@@ -125,7 +126,7 @@ Node* mem_malloc(List* node_list, int size) {
 
     Node* cur_node = node_list->first();
     Node* best_node = NULL;
-    while (cur_node != node_list->super_trailor) {
+    while (cur_node != node_list->super_trailer) {
         if (cur_node->size < size) {
             cur_node = cur_node->next;
             continue;
@@ -224,4 +225,3 @@ int main() {
     }
     return 0;
 }
-
