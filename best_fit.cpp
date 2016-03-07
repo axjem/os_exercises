@@ -5,7 +5,7 @@ using namespace std;
 
 template<typename T>
 string to_string(T value) {
-    std::ostringstream os;
+    ostringstream os;
     os << value;
     return os.str();
 }
